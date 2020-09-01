@@ -24,15 +24,15 @@ func TestPrint(t *testing.T) {
 
 // Tree a simple binary search tree for testing
 type Tree struct {
-	root  *Node
+	root *Node
 }
 
 // Node tree node
 type Node struct {
-	Key    int
-	Value  interface{}
-	Left   *Node
-	Right  *Node
+	Key   int
+	Value interface{}
+	Left  *Node
+	Right *Node
 }
 
 // Append append a new node to the tree
@@ -43,8 +43,8 @@ func (t *Tree) Append(key int, val interface{}) {
 func update(node **Node, key int, val interface{}) {
 	if *node == nil {
 		*node = &Node{
-			Key:    key,
-			Value:  val,
+			Key:   key,
+			Value: val,
 		}
 		return
 	} else if key == (*node).Key {

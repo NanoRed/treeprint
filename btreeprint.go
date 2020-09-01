@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// BtreeNode binary tree interface
 type BtreeNode interface {
 	GetKey() int
 	GetValue() interface{}
@@ -13,6 +14,7 @@ type BtreeNode interface {
 	GetRightNode() BtreeNode
 }
 
+// Sprint get print text
 func Sprint(entryNode BtreeNode) string {
 	rt := reflect.TypeOf(entryNode)
 	rv := reflect.ValueOf(entryNode)
