@@ -63,17 +63,17 @@ func (n *Node) GetKey() int {
 	return n.Key
 }
 
-// GetKey implement interface
+// GetValue implement interface
 func (n *Node) GetValue() interface{} {
 	return n.Value
 }
 
-// GetKey implement interface
+// GetLeftNode implement interface
 func (n *Node) GetLeftNode() BtreeNode {
 	return n.Left
 }
 
-// GetKey implement interface
+// GetRightNode implement interface
 func (n *Node) GetRightNode() BtreeNode {
 	return n.Right
 }
