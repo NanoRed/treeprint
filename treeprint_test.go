@@ -1,4 +1,4 @@
-package btreeprint
+package treeprint
 
 import (
 	"math/rand"
