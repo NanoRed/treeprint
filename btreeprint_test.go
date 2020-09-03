@@ -7,42 +7,48 @@ import (
 )
 
 func TestPrint(t *testing.T) {
-	number := make([]int, 0)
-	for i := 0; i < 20; i++ {
-		rand.Seed(time.Now().UnixNano())
-		number = append(number, rand.Intn(100000))
+
+	getNumber := func() []int {
+		number := make([]int, 0)
+		for i := 0; i < 20; i++ {
+			rand.Seed(time.Now().UnixNano())
+			number = append(number, rand.Intn(100000))
+		}
+		t.Logf("\n%v", number)
+		return number
 	}
 
-	tree := &Tree{}
-	for key, val := range number {
+	// binary search tree test
+	tree := &BinarySearchTree{}
+	for key, val := range getNumber() {
 		tree.Append(val, key)
 	}
-
-	t.Logf("\n%v", number)
 	t.Logf("\n%s", Sprint(tree.root))
+
+	// TODO() multi leaf node tree test
 }
 
-// Tree a simple binary search tree for testing
-type Tree struct {
-	root *Node
+// BinarySearchTree binary search tree for testing
+type BinarySearchTree struct {
+	root *BinarySearchNode
 }
 
-// Node tree node
-type Node struct {
+// BinarySearchNode binary search tree node
+type BinarySearchNode struct {
 	Key   int
 	Value interface{}
-	Left  *Node
-	Right *Node
+	Left  *BinarySearchNode
+	Right *BinarySearchNode
 }
 
 // Append append a new node to the tree
-func (t *Tree) Append(key int, val interface{}) {
+func (t *BinarySearchTree) Append(key int, val interface{}) {
 	update(&t.root, key, val)
 }
 
-func update(node **Node, key int, val interface{}) {
+func update(node **BinarySearchNode, key int, val interface{}) {
 	if *node == nil {
-		*node = &Node{
+		*node = &BinarySearchNode{
 			Key:   key,
 			Value: val,
 		}
@@ -58,22 +64,21 @@ func update(node **Node, key int, val interface{}) {
 	}
 }
 
-// GetKey implement interface
-func (n *Node) GetKey() int {
+// GetKey implement treeprint
+func (n *BinarySearchNode) GetKey() int {
 	return n.Key
 }
 
-// GetValue implement interface
-func (n *Node) GetValue() interface{} {
+// GetValue implement treeprint
+func (n *BinarySearchNode) GetValue() interface{} {
 	return n.Value
 }
 
-// GetLeftNode implement interface
-func (n *Node) GetLeftNode() BtreeNode {
-	return n.Left
-}
-
-// GetRightNode implement interface
-func (n *Node) GetRightNode() BtreeNode {
-	return n.Right
+// RangeNode implement treeprint
+func (n *BinarySearchNode) RangeNode() chan BtreeNode {
+	c := make(chan BtreeNode, 2)
+	c <- n.Left
+	c <- n.Right
+	close(c)
+	return c
 }
