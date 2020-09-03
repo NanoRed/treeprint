@@ -8,7 +8,7 @@ import (
 
 // TreeNode binary tree interface
 type TreeNode interface {
-	GetKey() int
+	GetKey() interface{}
 	GetValue() interface{}
 	RangeNode() chan TreeNode
 }
@@ -38,7 +38,7 @@ func Sprint(entryNode TreeNode) string {
 		node:  entryNode,
 		layer: 1,
 		count: 1,
-		str:   fmt.Sprintf("%d(%v)", entryNode.GetKey(), entryNode.GetValue()),
+		str:   fmt.Sprintf("%v(%v)", entryNode.GetKey(), entryNode.GetValue()),
 	}
 	entryNodeInfo.len = len(entryNodeInfo.str)
 	queue := []*nodeInfo{entryNodeInfo}
@@ -57,7 +57,7 @@ func Sprint(entryNode TreeNode) string {
 				currentLeafNodeInfo := &nodeInfo{
 					node:       currentLeafNode,
 					layer:      current.layer + 1,
-					str:        fmt.Sprintf("%d(%v)", currentLeafNode.GetKey(), currentLeafNode.GetValue()),
+					str:        fmt.Sprintf("%v(%v)", currentLeafNode.GetKey(), currentLeafNode.GetValue()),
 					parentNode: current,
 				}
 				currentLeafNodeInfo.len = len(currentLeafNodeInfo.str)
