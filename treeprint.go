@@ -6,15 +6,15 @@ import (
 	"strings"
 )
 
-// BtreeNode binary tree interface
-type BtreeNode interface {
+// TreeNode binary tree interface
+type TreeNode interface {
 	GetKey() int
 	GetValue() interface{}
-	RangeNode() chan BtreeNode
+	RangeNode() chan TreeNode
 }
 
 // Sprint get print text
-func Sprint(entryNode BtreeNode) string {
+func Sprint(entryNode TreeNode) string {
 	rt := reflect.TypeOf(entryNode)
 	rv := reflect.ValueOf(entryNode)
 	if rt.Kind() != reflect.Ptr {
@@ -23,7 +23,7 @@ func Sprint(entryNode BtreeNode) string {
 		return "<nil>"
 	}
 	type nodeInfo struct {
-		node        BtreeNode
+		node        TreeNode
 		layer       int
 		count       int
 		index       int

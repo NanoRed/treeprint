@@ -75,8 +75,8 @@ func (n *BinarySearchNode) GetValue() interface{} {
 }
 
 // RangeNode implement treeprint
-func (n *BinarySearchNode) RangeNode() chan BtreeNode {
-	c := make(chan BtreeNode, 2)
+func (n *BinarySearchNode) RangeNode() chan TreeNode {
+	c := make(chan TreeNode, 2)
 	c <- n.Left
 	c <- n.Right
 	close(c)
