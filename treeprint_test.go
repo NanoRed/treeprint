@@ -65,7 +65,7 @@ func update(node **BinarySearchNode, key int, val interface{}) {
 }
 
 // GetKey implement treeprint
-func (n *BinarySearchNode) GetKey() int {
+func (n *BinarySearchNode) GetKey() interface{} {
 	return n.Key
 }
 
