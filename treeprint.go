@@ -23,24 +23,30 @@ func Sprint(entryNode TreeNode) string {
 		return "<nil>"
 	}
 	type nodeInfo struct {
-		node        TreeNode
-		layer       int
-		count       int
-		index       int
-		len         int
-		str         string
-		hasAddedBar bool
-		parentNode  *nodeInfo
-		leafNode    []*nodeInfo
+		node       TreeNode
+		layer      int
+		count      int
+		index      int
+		len        int
+		str        string
+		str2       string
+		hasBar     bool
+		segLen     map[int]int
+		parentNode *nodeInfo
+		leafNode   []*nodeInfo
 	}
 	layer := make([][]*nodeInfo, 0)
 	entryNodeInfo := &nodeInfo{
-		node:  entryNode,
-		layer: 1,
-		count: 1,
-		str:   fmt.Sprintf("%v(%v)", entryNode.GetKey(), entryNode.GetValue()),
+		node:   entryNode,
+		layer:  1,
+		count:  1,
+		str:    fmt.Sprintf("%v(%v)", entryNode.GetKey(), entryNode.GetValue()),
+		segLen: make(map[int]int),
 	}
 	entryNodeInfo.len = len(entryNodeInfo.str)
+	for i := 0; i < entryNodeInfo.len; i++ {
+		entryNodeInfo.str2 += " "
+	}
 	queue := []*nodeInfo{entryNodeInfo}
 	currentLayer := 2
 	currentLayerIndex := 0
@@ -53,14 +59,21 @@ func Sprint(entryNode TreeNode) string {
 		current := queue[i]
 		leafIndex := 0
 		for currentLeafNode := range current.node.RangeNode() {
-			if !reflect.ValueOf(currentLeafNode).IsNil() {
+			if reflect.ValueOf(currentLeafNode).IsNil() {
+				current.leafNode = append(current.leafNode, nil)
+			} else {
 				currentLeafNodeInfo := &nodeInfo{
 					node:       currentLeafNode,
 					layer:      current.layer + 1,
 					str:        fmt.Sprintf("%v(%v)", currentLeafNode.GetKey(), currentLeafNode.GetValue()),
+					segLen:     make(map[int]int),
 					parentNode: current,
 				}
 				currentLeafNodeInfo.len = len(currentLeafNodeInfo.str)
+				currentLeafNodeInfo.segLen = map[int]int{ 1: currentLeafNodeInfo.len }
+				for j := 0; j < currentLeafNodeInfo.len; j++ {
+					currentLeafNodeInfo.str2 += " "
+				}
 				if currentLeafNodeInfo.layer != currentLayer {
 					currentLayer = currentLeafNodeInfo.layer
 					currentLayerIndex = 0
@@ -72,10 +85,12 @@ func Sprint(entryNode TreeNode) string {
 				currentLayerIndex += currentLeafNodeInfo.len + 1
 				queue = append(queue, currentLeafNodeInfo)
 				current.leafNode = append(current.leafNode, currentLeafNodeInfo)
-			} else {
-				current.leafNode = append(current.leafNode, nil)
+				current.segLen[currentLeafNodeInfo.count] = current.len
 			}
 			leafIndex++
+		}
+		for ; leafIndex < 2; leafIndex++ {
+			current.leafNode = append(current.leafNode, nil)
 		}
 		if current.layer > len(layer) {
 			layer = append(layer, make([]*nodeInfo, 0))
@@ -103,30 +118,32 @@ func Sprint(entryNode TreeNode) string {
 		}
 	}
 	alignOther = func(current *nodeInfo) {
-		lastLeafIndex := len(current.leafNode)-1
+		lastLeafIndex := len(current.leafNode) - 1
 		for i := 1; i <= lastLeafIndex; i++ {
 			if current.leafNode[i] == nil {
 				continue
-			} else if !current.hasAddedBar {
+			} else if !current.hasBar {
 				if val := current.leafNode[i].index - current.index - current.len; val > 0 {
-					tmp := ""
 					for k := 0; k < val; k++ {
-						tmp += "-"
+						current.str += "-"
+						current.str2 += " "
 					}
-					tmp += "+"
-					current.str += tmp
+					current.str += "+"
+					current.str2 += "|"
 					newLen := len(current.str)
 					offset := newLen - current.len
 					current.len = newLen
+					current.segLen[current.leafNode[i].count] = current.len
 					for k := current.count; k < len(layer[current.layer-1]); k++ {
 						layer[current.layer-1][k].index += offset
 					}
 				} else {
-					tmp := "-+"
-					current.str += tmp
+					current.str += "-+"
+					current.str2 += " |"
 					newLen := len(current.str)
 					offset := newLen - current.len
 					current.len = newLen
+					current.segLen[current.leafNode[i].count] = current.len
 					for k := current.count; k < len(layer[current.layer-1]); k++ {
 						layer[current.layer-1][k].index += offset
 					}
@@ -136,11 +153,14 @@ func Sprint(entryNode TreeNode) string {
 					}
 				}
 				if i == lastLeafIndex {
-					current.hasAddedBar = true
+					current.hasBar = true
 				}
 			} else {
+				parentIndex := current.index + current.segLen[current.leafNode[i].count] - 1
+				selfIndex := current.leafNode[i].index
+				gap := parentIndex - selfIndex
 				for k := current.leafNode[i].count - 1; k < len(layer[current.layer]); k++ {
-					layer[current.layer][k].index += current.index + current.len - 1 - current.leafNode[i].index
+					layer[current.layer][k].index += gap
 				}
 			}
 			for j := current.leafNode[i].count - 1; j < len(layer[current.layer]); j++ {
@@ -172,19 +192,11 @@ func Sprint(entryNode TreeNode) string {
 			} else {
 				line2 += " "
 			}
-			for k := 0; k < layer[i][j].len-2; k++ {
-				line2 += " "
-			}
-			for k := 1; k < len(layer[i][j].leafNode); k++ {
-				if layer[i][j].leafNode[k] != nil {
-					line2 += "|"
-				} else {
-					line2 += " "
-				}
-			}
+			line2 += layer[i][j].str2[1:]
 		}
+		line1 = strings.ReplaceAll(line1, "-+-", "─┬─")
+		line1 = strings.ReplaceAll(line1, "-+", "─┐")
 		line1 = strings.ReplaceAll(line1, "-", "─")
-		line1 = strings.ReplaceAll(line1, "+", "┐")
 		text += line1 + "\n"
 		text += line2 + "\n"
 	}

@@ -71,7 +71,7 @@ func (n *BinarySearchNode) GetKey() interface{} {
 
 // GetValue implement treeprint
 func (n *BinarySearchNode) GetValue() interface{} {
-	return n.Value
+	return ""
 }
 
 // RangeNode implement treeprint
