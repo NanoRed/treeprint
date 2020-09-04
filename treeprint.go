@@ -40,7 +40,7 @@ func Sprint(entryNode TreeNode) string {
 		node:   entryNode,
 		layer:  1,
 		count:  1,
-		str:    fmt.Sprintf("%v(%v)", entryNode.GetKey(), entryNode.GetValue()),
+		str:    fmt.Sprintf("%v%v", entryNode.GetKey(), entryNode.GetValue()),
 		segLen: make(map[int]int),
 	}
 	entryNodeInfo.len = len(entryNodeInfo.str)
@@ -65,7 +65,7 @@ func Sprint(entryNode TreeNode) string {
 				currentLeafNodeInfo := &nodeInfo{
 					node:       currentLeafNode,
 					layer:      current.layer + 1,
-					str:        fmt.Sprintf("%v(%v)", currentLeafNode.GetKey(), currentLeafNode.GetValue()),
+					str:        fmt.Sprintf("%v%v", currentLeafNode.GetKey(), currentLeafNode.GetValue()),
 					segLen:     make(map[int]int),
 					parentNode: current,
 				}
